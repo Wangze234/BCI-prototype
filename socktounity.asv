@@ -1,0 +1,25 @@
+clc
+clear all
+tcpipServer = tcpip('0.0.0.0',55000,'NetworkRole','Server');
+
+while(true)
+    
+    if tcpipServer.NumActiveConnections == 0  
+        try  
+            tcpipServer.accept(); % Accept connection requests  
+        catch e  
+            disp('Error accepting connection: ' + e.message);  
+            continue; % Skip the current iteration and continue waiting for the next connection
+        end  
+    end  
+    % Get the current active connection object  
+    conn = tcpipServer.ActiveConnection;  
+    % Value to be sent 
+    valueToSend = 1;
+    % Convert to integer type
+    bytesToSend = int32(valueToSend); 
+    % send data  
+    fwrite(conn, bytesToSend, 'int32');
+    % Clear active connection references so that new connections can be processed in the next iteration
+    tcpipServer.ActiveConnection = [];  
+end
